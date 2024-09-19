@@ -117,7 +117,7 @@ where
     /// use nohash_hasher::BuildNoHashHasher;
     /// use weave::Graph;
     ///
-    /// let graph: Graph<u64, u64> = Graph::with_capacity_and_hasher(10, BuildNoHashHasher::default());
+    /// let graph: Graph<u64, u64, (), BuildNoHashHasher<u64>> = Graph::with_capacity_and_hasher(10, Default::default());
     /// assert!(graph.is_empty());
     /// ```
     pub fn with_capacity_and_hasher(capacity: usize, hasher: S) -> Self {
