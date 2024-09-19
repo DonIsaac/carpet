@@ -67,7 +67,7 @@ jobs:
       - uses: taiki-e/checkout-action@v1
       - uses: Boshen/setup-rust@main
         with:
-          components: rustdoc
+          components: rust-docs
           cache-key: warm
       - run: cargo doc --all-features --no-deps --document-private-items
         env:
