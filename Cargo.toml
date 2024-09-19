@@ -1,5 +1,5 @@
 [package]
-name        = "weave"
+name        = "carpet"
 version     = "0.1.0"
 description = "A thread-safe, fully-parallel directed graph"
 keywords    = ["graph", "rayon", "parallel", "thread-safe"]

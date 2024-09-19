@@ -1,12 +1,12 @@
-# Weave
+# Carpet
 
-Weave is a thread-safe, fully-parallelized directed graph designed for
+Carpet is a thread-safe, fully-parallelized directed graph designed for
 write-heavy multi-threaded jobs.
 
 Graphs directed, and both nodes and edges may store arbitrary data.
 
 ```rust
-use weave::Graph;
+use carpet::Graph;
 
 type UserId = u64;
 struct User {
@@ -38,19 +38,19 @@ users.add_edge(2, 3, Relationship::Blocks);
 
 ## Installation
 
-Weave is available on [crates.io](https://crates.io/weave)
+Carpet is available on [crates.io](https://crates.io/carpet)
 
 ```sh
-cargo add weave
+cargo add carpet
 ```
 
 ## Thread-Safety
 
-Weave graphs can be safely mutated across threads. Most methods have a
+Carpet graphs can be safely mutated across threads. Most methods have a
 corresponding `*_mut` method that takes a read-only `&self` reference but allows
 for writes to the graph.
 
-Weave uses [dashmap](https://crates.io/dashmap) for storing graph data, which
+Carpet uses [dashmap](https://crates.io/dashmap) for storing graph data, which
 features shared-based locking allowing for concurrent writes to different
 sections of the graph. However, this introduces a footgun: attempts to obtain
 two write references, or one read and one write reference, to the same graph
@@ -60,12 +60,12 @@ documentation](https://docs.rs/dashmap) for more information.
 
 ## Parallelism
 
-Weave is intended to be used with [rayon](https://crates.io/rayon), and
+Carpet is intended to be used with [rayon](https://crates.io/rayon), and
 implements rayon's [parallel iterator
 traits](https://docs.rs/rayon/latest/rayon/iter/index.html).
 
 ```rust
-use weave::Graph;
+use carpet::Graph;
 use rayon::prelude::*;
 
 let graph: Graph<i32, i32> = (0..100).map(|i| (i, i)).collect();
@@ -74,13 +74,13 @@ graph.par_iter().for_each(|entry| {
 })
 ```
 
-Weave does not force you to use rayon if you prefer a different parallelism
+Carpet does not force you to use rayon if you prefer a different parallelism
 crate. All rayon-related methods and trait implementations can be disabled by
 turning off the `rayon` feature.
 
 ```toml
 [dependencies]
-weave = { version = "*", default-features = false }
+carpet = { version = "*", default-features = false }
 ```
 
 ## Debugging
@@ -90,12 +90,12 @@ debugging by enabling the `dot` feature.
 
 ```toml
 [dependencies]
-weave = { version = "*", features = ["dot"] }
+carpet = { version = "*", features = ["dot"] }
 ```
 
 ```rust
 use std::{fs, io::{self, Write}};
-use weave::{dot::ToDot, Graph};
+use carpet::{dot::ToDot, Graph};
 
 // Save the dot graph to a file, then run `dot -Tpng debug.dot -o debug.png`
 fn save_to_file() -> io::Result<()> {
@@ -120,8 +120,8 @@ output.
 
 ## Performance
 
-Weave trades conccurrent write performance for memory efficiency. To combat some
-of this, Weave provides several optimization methods for use cases that have a
+Carpet trades conccurrent write performance for memory efficiency. To combat some
+of this, Carpet provides several optimization methods for use cases that have a
 write-heavy phase and a read-heavy phase.
 
 ### Freeing Memory
@@ -132,7 +132,7 @@ a more aggressive version that frees memory in all edge lists, resulting in
 better compression at the cost of performance.
 
 ```rust
-use weave::Graph;
+use carpet::Graph;
 let mut graph: Graph<i32, i32> = (0..100).map(|i| (i, i)).collect();
 
 graph.shrink_to_fit();
@@ -151,5 +151,5 @@ enables:
 2. Trait implementations that are otherwise impossible to add, such as `Index`
 
 ## License
-Weave is available under the MIT license. You may find a copy in
+Carpet is available under the MIT license. You may find a copy in
 [LICENSE](./LICENSE)
