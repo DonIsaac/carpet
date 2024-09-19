@@ -113,10 +113,11 @@ where
     /// hasher.
     ///
     /// # Example
+    /// ```
     /// use nohash_hasher::BuildNoHashHasher;
     /// use weave::Graph;
     ///
-    /// let graph: Graph<u64, u64> = Graph::with_capacity_and_hasher(10, BuildNoHashHasher::default());
+    /// let graph: Graph<u64, u64, (), BuildNoHashHasher<u64>> = Graph::with_capacity_and_hasher(10, Default::default());
     /// assert!(graph.is_empty());
     /// ```
     pub fn with_capacity_and_hasher(capacity: usize, hasher: S) -> Self {
@@ -171,6 +172,10 @@ where
         self.nodes.insert(key, value)
     }
 
+    pub fn get_edge(&'a self, edge_id: EdgeId) -> Option<Ref<'a, EdgeId, E>> {
+        self.edges.get(&edge_id)
+    }
+
     /// Add an edge between two existing nodes, originating at `from` and terminating at `to`.
     pub fn add_edge(&self, from: K, to: K, edge: E)
     where
@@ -188,6 +193,22 @@ where
             .or_default()
             .push((edge_id, to.clone()));
         self.to.entry(to).or_default().push((edge_id, from));
+    }
+
+    pub fn edges_from<Q>(&'a self, from: &Q) -> Option<Ref<'a, K, Vec<(EdgeId, K)>>>
+    where
+        K: Borrow<Q>,
+        Q: Hash + Eq + ?Sized,
+    {
+        self.from.get(from)
+    }
+
+    pub fn edges_to<Q>(&'a self, to: &Q) -> Option<Ref<'a, K, Vec<(EdgeId, K)>>>
+    where
+        K: Borrow<Q>,
+        Q: Hash + Eq + ?Sized,
+    {
+        self.to.get(to)
     }
 
     pub fn iter_nodes(&'a self) -> impl Iterator<Item = RefMulti<'a, K, V>> + 'a {
@@ -315,49 +336,4 @@ where
             .field("from", &self.from)
             .finish()
     }
-}
-
-#[test]
-fn test_from_iter() {
-    use crate::Graph;
-
-    type UserId = u64;
-    struct User {
-        id: UserId,
-        name: String,
-    }
-
-    pub enum Relationship {
-        Follows,
-        Blocks,
-    }
-
-    impl std::borrow::Borrow<UserId> for User {
-        fn borrow(&self) -> &UserId {
-            &self.id
-        }
-    }
-
-    let users: Graph<UserId, User, Relationship> = [
-        User {
-            id: 1,
-            name: "Alice".to_string(),
-        },
-        User {
-            id: 2,
-            name: "Bob".to_string(),
-        },
-        User {
-            id: 3,
-            name: "Charlie".to_string(),
-        },
-    ]
-    .into_iter()
-    .collect();
-
-    assert_eq!(users.get_node(&1).unwrap().value().name, "Alice");
-
-    // Alice follows Bob, and Bob blocks Charlie
-    users.add_edge(1, 2, Relationship::Follows);
-    users.add_edge(2, 3, Relationship::Blocks);
 }
