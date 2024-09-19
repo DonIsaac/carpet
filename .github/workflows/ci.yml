@@ -60,6 +60,20 @@ jobs:
       - run: cargo nextest run --all-features
       - run: cargo test --doc --all-features
 
+  doc:
+    name: Doc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: taiki-e/checkout-action@v1
+      - uses: Boshen/setup-rust@main
+        with:
+          components: rustdoc
+          cache-key: warm
+      - run: cargo doc --all-features --no-deps --document-private-items
+        env:
+          RUSTDOCFLAGS: '-D warnings'
+
+
   typos:
     name: Spell Check
     runs-on: ubuntu-latest
