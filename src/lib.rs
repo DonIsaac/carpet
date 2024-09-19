@@ -228,7 +228,7 @@ where
     // E: fmt::Display,
     S: BuildHasher + Clone,
 {
-    fn to_dot<W: io::Write>(&self, writer: &mut W) -> io::Result<()> {
+    fn to_dot<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         const INDENT: &str = "  ";
         // let mut dot: DotBuilder<K>
         writeln!(writer, "digraph G {{")?;
@@ -313,6 +313,8 @@ fn test_from_iter() {
     ]
     .into_iter()
     .collect();
+
+    assert_eq!(users.get_node(&1).unwrap().value().name, "Alice");
 
     // Alice follows Bob, and Bob blocks Charlie
     users.add_edge(1, 2, Relationship::Follows);
