@@ -43,6 +43,7 @@ type EdgeList<K, S> = DashMap<K, Vec<(EdgeId, K)>, S>;
 type EdgeHasher = BuildNoHashHasher<EdgeId>;
 type DefaultHasher = RandomState;
 
+/// A thread-safe directed graph with stateful edges.
 pub struct Graph<K, V, E = (), S = DefaultHasher> {
     nodes: DashMap<K, V, S>,
     edges: DashMap<EdgeId, E, EdgeHasher>,
@@ -67,10 +68,27 @@ where
     }
 }
 impl<'a, K: 'a + Eq + Hash, V: 'a, E: 'a> Graph<K, V, E, DefaultHasher> {
+    /// Create an empty [`Graph`].
+    ///
+    /// # Example
+    /// ```
+    /// use weave::Graph;
+    /// let graph: Graph<u64, String> = Graph::new();
+    /// assert!(graph.is_empty());
+    /// ```
     pub fn new() -> Self {
         Self::with_hasher(DefaultHasher::default())
     }
 
+    /// Create a new [`Graph`] with enough memory allocated for at least `capacity` nodes.
+    ///
+    /// # Example
+    /// ```
+    /// use weave::Graph;
+    ///
+    /// let graph: Graph<u64, String> = Graph::with_capacity(10);
+    /// assert!(graph.is_empty());
+    /// ```
     pub fn with_capacity(capacity: usize) -> Self {
         Self::with_capacity_and_hasher(capacity, DefaultHasher::default())
     }
@@ -83,10 +101,24 @@ where
     E: 'a,
     S: BuildHasher + Clone,
 {
+    /// Create a [`Graph`] that uses the provided hasher for indexing nodes.
     pub fn with_hasher(hasher: S) -> Self {
         Self::with_capacity_and_hasher(0, hasher)
     }
 
+    /// Create a [`Graph`] with the specified starting capacity and hasher.
+    ///
+    /// Enough memory will be reserved for at least `capacity` nodes, while edges will have less
+    /// memory reserved. The hasher will only be used for nodes; edges have a non-customizable
+    /// hasher.
+    ///
+    /// # Example
+    /// use nohash_hasher::BuildNoHashHasher;
+    /// use weave::Graph;
+    ///
+    /// let graph: Graph<u64, u64> = Graph::with_capacity_and_hasher(10, BuildNoHashHasher::default());
+    /// assert!(graph.is_empty());
+    /// ```
     pub fn with_capacity_and_hasher(capacity: usize, hasher: S) -> Self {
         // Assuming a fully-connected graph with even to/from distribution.
         // TODO: validate this assumption
@@ -100,10 +132,12 @@ where
         }
     }
 
+    /// Returns the number of nodes in the graph.
     pub fn len(&self) -> usize {
         self.nodes.len()
     }
 
+    /// Returns `true` if the graph contains no nodes (it has a [`len`](Graph::len) of 0).
     pub fn is_empty(&self) -> bool {
         self.nodes.is_empty()
     }
@@ -160,6 +194,10 @@ where
         self.nodes.iter()
     }
 
+    /// Free excess memory allocated for nodes and edges.
+    ///
+    /// For runtime performance reasons, edge lists will not be shrunk. If you're facing memory
+    /// bottlenecks and want this behavior, use [`Graph::shrink_all_to_fit`]
     pub fn shrink_to_fit(&mut self) {
         self.nodes.shrink_to_fit();
         self.edges.shrink_to_fit();
@@ -167,6 +205,9 @@ where
         self.from.shrink_to_fit();
     }
 
+    /// Aggressively release unused memory resources.
+    ///
+    /// This has a high CPU cost. Use with discretion.
     pub fn shrink_all_to_fit(&mut self) {
         self.nodes.shrink_to_fit();
         self.edges.shrink_to_fit();
