@@ -113,6 +113,7 @@ where
     /// hasher.
     ///
     /// # Example
+    /// ```
     /// use nohash_hasher::BuildNoHashHasher;
     /// use weave::Graph;
     ///
