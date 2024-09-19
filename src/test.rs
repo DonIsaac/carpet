@@ -70,7 +70,7 @@ fn test_from_iter() {
     let alice_relations = users.edges_from(&alice.id).unwrap();
     assert_eq!(alice_relations.len(), 1);
 
-    let alice_to_bob = alice_relations[0].clone();
+    let alice_to_bob = alice_relations[0];
     assert_eq!(alice_to_bob.1, bob.id);
     assert_eq!(
         *users.get_edge(alice_to_bob.0).unwrap(),
@@ -80,7 +80,7 @@ fn test_from_iter() {
     // Test that edges to Bob are correct
     let who_follows_bob = users.edges_to(&bob.id).unwrap();
     assert_eq!(who_follows_bob.len(), 1);
-    let bob_from_alice = who_follows_bob[0].clone();
+    let bob_from_alice = who_follows_bob[0];
     // This is the same edge
     assert_eq!(bob_from_alice.0, alice_to_bob.0);
 }
