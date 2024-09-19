@@ -4,8 +4,8 @@ version     = "0.1.0"
 description = "A thread-safe, fully-parallel directed graph"
 keywords    = ["graph", "rayon", "parallel", "thread-safe"]
 categories  = ["data-structures", "concurrency"]
-repository  = "https://github.com/DonIsaac/weave"
-homepage    = "https://github.com/DonIsaac/weave"
+repository  = "https://github.com/DonIsaac/carpet"
+homepage    = "https://github.com/DonIsaac/carpet"
 license     = "MIT"
 edition     = "2021"
 
