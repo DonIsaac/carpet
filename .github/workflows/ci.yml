@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+      - "*.yml"
+      - "*.yaml"
+      - "!.github/workflows/ci.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Boshen/setup-rust@main
+        with:
+          components: rustfmt
+          tools: taplo-cli
+          restore-cache: false
+      - run: taplo lint
+      - run: cargo fmt -- --check
+
+  lint:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: taiki-e/checkout-action@v1
+      - uses: Boshen/setup-rust@main
+        with:
+          cache-key: warm
+          components: clippy
+      - run: cargo clippy --all-targets --all-features --no-deps -- -D warnings
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Boshen/setup-rust@main
+        with:
+          # warm cache factory for all other CI jobs
+          # cache `target` directory to avoid download crates
+          save-cache: ${{ github.ref_name == 'main' }}
+          cache-key: warm
+          tools: cargo-nextest
+
+      - run: cargo check --all-targets --all-features --locked
+      - run: cargo test --all-features --no-run
+      - run: cargo nextest run --all-features
+      - run: cargo test --doc --all-features
+
+  typos:
+    name: Spell Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: taiki-e/checkout-action@v1
+      - uses: crate-ci/typos@v1.24.5
+        with:
+          files: .
+
+  shear:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Boshen/setup-rust@main
+        with:
+          tools: cargo-shear
+          restore-cache: false
+      - run: cargo shear
+
