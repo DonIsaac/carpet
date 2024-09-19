@@ -38,7 +38,7 @@ users.add_edge(2, 3, Relationship::Blocks);
 
 ## Installation
 
-Carpet is available on [crates.io](https://crates.io/carpet)
+Carpet is available on [crates.io](https://crates.io/crates/carpet)
 
 ```sh
 cargo add carpet
@@ -50,7 +50,7 @@ Carpet graphs can be safely mutated across threads. Most methods have a
 corresponding `*_mut` method that takes a read-only `&self` reference but allows
 for writes to the graph.
 
-Carpet uses [dashmap](https://crates.io/dashmap) for storing graph data, which
+Carpet uses [dashmap](https://crates.io/crates/dashmap) for storing graph data, which
 features shared-based locking allowing for concurrent writes to different
 sections of the graph. However, this introduces a footgun: attempts to obtain
 two write references, or one read and one write reference, to the same graph
@@ -60,7 +60,7 @@ documentation](https://docs.rs/dashmap) for more information.
 
 ## Parallelism
 
-Carpet is intended to be used with [rayon](https://crates.io/rayon), and
+Carpet is intended to be used with [rayon](https://crates.io/crates/rayon), and
 implements rayon's [parallel iterator
 traits](https://docs.rs/rayon/latest/rayon/iter/index.html).
 
