@@ -1,0 +1,23 @@
+[package]
+name        = "weave"
+version     = "0.1.0"
+description = "A thread-safe, fully-parallel directed graph"
+keywords    = ["graph", "rayon", "parallel", "thread-safe"]
+categories  = ["data-structures", "concurrency"]
+repository  = "https://github.com/DonIsaac/weave"
+homepage    = "https://github.com/DonIsaac/weave"
+license     = "MIT"
+edition     = "2021"
+
+[features]
+default = ["rayon"]
+dot     = []
+rayon   = ["dep:rayon", "dashmap/rayon"]
+
+[dependencies]
+dashmap       = { version = "6.1.0", features = ["rayon"] }
+nohash-hasher = { version = "0.2.0" }
+rayon         = { version = "1.10.0", optional = true }
+
+[package.metadata."docs.rs"]
+all-features = true
